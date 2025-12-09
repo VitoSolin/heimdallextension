@@ -212,7 +212,7 @@ class FilterEngine {
         const cleanText = lower.replace(/[^a-z0-9]/g, '');
 
         // expanded strong keywords including new gambling brands
-        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|link|situs|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|withdraw|deposit|bonus|promo|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|bet|menang|kemenangan|untung|profit|rtp|winrate)\b/.test(lower)) {
+        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|link|situs|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|withdraw|deposit|bonus|promo|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|bet|menang|kemenangan|untung|profit|rtp|winrate|gelora)\b/.test(lower)) {
             score += 50;
             reasons.push('Strong Keyword Match');
         } else if (/(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|jackpot|gembira|cuanwin|mpo)/.test(cleanText)) {
@@ -224,6 +224,12 @@ class FilterEngine {
         if (/[A-Z]{3,}\d{1,4}/.test(normalized) || /\d{1,4}[A-Z]{3,}/.test(normalized)) {
             score += 60;
             reasons.push('Brand+Number Pattern (e.g. XXXX4D)');
+        }
+
+        // brand ending with 4D (togel term - "4 Dimensi")
+        if (/[A-Z]{3,}4D\b/i.test(normalized) || /[a-z]{3,}4d\b/.test(cleanText)) {
+            score += 80;
+            reasons.push('Togel 4D Brand Pattern');
         }
 
         // gambling suffix (added 77, 99, 123, 168, 777)

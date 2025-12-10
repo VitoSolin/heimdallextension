@@ -1,3 +1,6 @@
+# Unduh Cepat
+https://cdn.jasasolin.com/projects/heimdall/heimdall-extension.zip
+
 # HeimdallScan - YouTube Judol Filter Extension
 
 Chrome extension untuk menyembunyikan komentar judi online (judol) di YouTube secara otomatis.

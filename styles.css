@@ -1,3 +1,38 @@
 .heimdall-hidden {
   display: none !important;
 }
+
+/* tampilkan komentar sementara buat navigasi */
+.heimdall-shown {
+  display: block !important;
+}
+
+/* mode cek: komentar judol terlihat tapi ditandai */
+.heimdall-check {
+  border-left: 3px solid #f59e0b !important;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, transparent 100%) !important;
+}
+
+/* animasi highlight waktu navigasi ke komentar judol */
+.heimdall-highlight {
+  display: block !important;
+  position: relative;
+  animation: heimdall-pulse 0.5s ease-in-out 3;
+  border-left: 4px solid #f5a623 !important;
+  background: linear-gradient(90deg, rgba(245, 166, 35, 0.15) 0%, transparent 100%) !important;
+  box-shadow: 0 0 20px rgba(245, 166, 35, 0.3) !important;
+}
+
+@keyframes heimdall-pulse {
+
+  0%,
+  100% {
+    border-left-color: #f5a623;
+    box-shadow: 0 0 20px rgba(245, 166, 35, 0.3);
+  }
+
+  50% {
+    border-left-color: #fbbf24;
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+  }
+}

@@ -119,12 +119,17 @@ class FilterEngine {
                 reasons.push(`nama channel mencurigakan (google+keyword): ${authorName}`);
             }
 
-            // pola: nama brand judi di nama channel
-            if (/(gembira|cuanwin|mpo|hoki|jp|jackpot|slot|gacor|maxwin|scatter|77|88|4d|bet|win|sultan|dewa|raja|king|mega|super|ultra)/i.test(normalizedName)) {
-                if (/\d+/.test(normalizedName) || /(gudang|uang|bos|cuan|dana|ovo|gopay|link|situs|resmi|terpercaya)/i.test(normalizedName)) {
-                    score += 100;
-                    reasons.push(`nama channel mencurigakan (brand+sesuatu): ${authorName}`);
-                }
+            // pola: nama brand judi SPESIFIK di nama channel
+            if (/(gembira|cuanwin|mpo|maxwin|scatter|gacor|judol|togel|pragmatic|olympus|zeus)\d*/i.test(normalizedName)) {
+                score += 100;
+                reasons.push(`nama channel mencurigakan (brand judi): ${authorName}`);
+            }
+
+            // pola: angka judi klasik di nama (77, 88, 138, 303, 4d) + kata kunci judi
+            if (/(77|88|99|138|303|4d)/i.test(normalizedName) &&
+                /(slot|gacor|hoki|jp|jackpot|bet|cuan|depo|wd)/i.test(normalizedName)) {
+                score += 100;
+                reasons.push(`nama channel mencurigakan (angka+keyword): ${authorName}`);
             }
 
             // pola: "uang" / "cuan" / "dana" di nama channel (umum di bot spam)
@@ -211,8 +216,9 @@ class FilterEngine {
         const lower = normalized.toLowerCase();
         const cleanText = lower.replace(/[^a-z0-9]/g, '');
 
-        // kata kunci kuat termasuk brand judi baru
-        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|link|situs|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|withdraw|deposit|bonus|promo|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|bet|menang|kemenangan|untung|profit|rtp|winrate|gelora)\b/.test(lower)) {
+        // kata kunci kuat - hanya yang spesifik judi, hapus yang terlalu umum
+        // dihapus: menang, kemenangan, untung, profit, bonus, promo, link, situs, deposit, withdraw (terlalu umum)
+        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|rtp|winrate|gelora)\b/.test(lower)) {
             score += 50;
             reasons.push('kata kunci kuat cocok');
         } else if (/(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|jackpot|gembira|cuanwin|mpo)/.test(cleanText)) {
@@ -251,8 +257,9 @@ class FilterEngine {
         }
 
         // pola brand + angka (GEMBIRA77, HOKI88, dll)
-        if (/\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|bet|win|max|sultan|dewa|raja|king|mega|super|ultra)[\s•·]*\d{2,4}\b/i.test(text) ||
-            /\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|bet|win|max|sultan|dewa|raja|king|mega|super|ultra)\d{2,4}\b/i.test(cleanText)) {
+        // hapus kata umum yang bisa bikin false positive
+        if (/\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|gacor|maxwin|scatter|togel|pragmatic)[\s•·]*\d{2,4}\b/i.test(text) ||
+            /\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|gacor|maxwin|scatter|togel|pragmatic)\d{2,4}\b/i.test(cleanText)) {
             score += 70;
             reasons.push('pola brand judi+angka');
         }

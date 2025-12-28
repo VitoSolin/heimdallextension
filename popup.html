@@ -250,6 +250,164 @@
             background: #ef4444;
             box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
         }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: #1e3a5f;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: #1e3a5f;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Judol List */
+        .judol-list {
+            max-height: 240px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .judol-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .judol-item:hover {
+            border-color: #d4a017;
+            background: #fffbeb;
+        }
+
+        .judol-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .judol-author {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .judol-preview {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .judol-score {
+            font-size: 10px;
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .scroll-btn {
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #f5a623 0%, #d4a017 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .scroll-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(212, 160, 23, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 24px 16px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            font-size: 13px;
+        }
+
+        /* Nav Controls */
+        .nav-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #2c5282;
+        }
+
+        .nav-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -266,27 +424,58 @@
 
         <!-- Stats -->
         <div class="stats-card">
-            <div class="stats-label">Komentar Disembunyikan</div>
+            <div class="stats-label">Komentar Judol Terdeteksi</div>
             <div class="stats-value" id="hiddenCount">0</div>
             <div class="stats-subtitle">di halaman ini</div>
         </div>
 
-        <!-- Toggle -->
-        <div class="toggle-section">
-            <span class="toggle-label">Filter Aktif</span>
-            <label class="toggle">
-                <input type="checkbox" id="enableToggle" checked>
-                <span class="toggle-slider"></span>
-            </label>
+        <!-- Tabs - Mode Selection -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="hide" data-mode="hide">Sembunyikan</button>
+            <button class="tab-btn" data-tab="check" data-mode="check">Cek</button>
         </div>
 
-        <!-- Threshold Slider -->
-        <div class="slider-section">
-            <div class="slider-header">
-                <span class="slider-label">Sensitivitas</span>
-                <span class="slider-value" id="thresholdValue">50</span>
+        <!-- Tab: Hide Mode (Settings) -->
+        <div class="tab-content active" id="tab-hide">
+            <!-- Toggle -->
+            <div class="toggle-section">
+                <span class="toggle-label">Filter Aktif</span>
+                <label class="toggle">
+                    <input type="checkbox" id="enableToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
-            <input type="range" id="thresholdSlider" min="20" max="100" value="50">
+
+            <!-- Threshold Slider -->
+            <div class="slider-section">
+                <div class="slider-header">
+                    <span class="slider-label">Sensitivitas</span>
+                    <span class="slider-value" id="thresholdValue">50</span>
+                </div>
+                <input type="range" id="thresholdSlider" min="20" max="100" value="50">
+            </div>
+
+            <div class="info-text" style="font-size: 11px; color: #64748b; text-align: center; margin-top: 8px;">
+                Komentar judol akan disembunyikan otomatis
+            </div>
+        </div>
+
+        <!-- Tab: Check Mode (Navigation) -->
+        <div class="tab-content" id="tab-check">
+            <div class="info-text" style="font-size: 11px; color: #64748b; text-align: center; margin-bottom: 12px;">
+                Komentar judol terlihat, klik untuk navigasi
+            </div>
+            <div class="judol-list" id="judolList">
+                <!-- List items will be populated by JS -->
+            </div>
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">✓</div>
+                <div class="empty-state-text">Tidak ada judol terdeteksi</div>
+            </div>
+            <div class="nav-controls" id="navControls" style="display: none;">
+                <button class="nav-btn" id="prevBtn">← Prev</button>
+                <button class="nav-btn" id="nextBtn">Next →</button>
+            </div>
         </div>
 
         <!-- Footer -->

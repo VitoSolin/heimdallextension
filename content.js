@@ -1,4 +1,4 @@
-// FANCY TEXT NORMALIZATION MAP
+// peta normalisasi fancy text
 const FANCY_MAP = {
     // lowercase bold script
     '𝓪': 'a', '𝓫': 'b', '𝓬': 'c', '𝓭': 'd', '𝓮': 'e', '𝓯': 'f', '𝓰': 'g',
@@ -15,7 +15,7 @@ const FANCY_MAP = {
     '𝐇': 'H', '𝐈': 'I', '𝐉': 'J', '𝐊': 'K', '𝐋': 'L', '𝐌': 'M', '𝐍': 'N',
     '𝐎': 'O', '𝐏': 'P', '𝐐': 'Q', '𝐑': 'R', '𝐒': 'S', '𝐓': 'T', '𝐔': 'U',
     '𝐕': 'V', '𝐖': 'W', '𝐗': 'X', '𝐘': 'Y', '𝐙': 'Z',
-    // Bold (mathematical) - lower
+    // bold (mathematical) - lower
     '𝐚': 'a', '𝐛': 'b', '𝐜': 'c', '𝐝': 'd', '𝐞': 'e', '𝐟': 'f', '𝐠': 'g',
     '𝐡': 'h', '𝐢': 'i', '𝐣': 'j', '𝐤': 'k', '𝐥': 'l', '𝐦': 'm', '𝐧': 'n',
     '𝐨': 'o', '𝐩': 'p', '𝐪': 'q', '𝐫': 'r', '𝐬': 's', '𝐭': 't', '𝐮': 'u',
@@ -51,14 +51,14 @@ const FANCY_MAP = {
     'ʜ': 'H', 'ɪ': 'I', 'ᴊ': 'J', 'ᴋ': 'K', 'ʟ': 'L', 'ᴍ': 'M', 'ɴ': 'N',
     'ᴏ': 'O', 'ᴘ': 'P', 'ǫ': 'Q', 'ʀ': 'R', 's': 'S', 'ᴛ': 'T', 'ᴜ': 'U',
     'ᴠ': 'V', 'ᴡ': 'W', 'x': 'X', 'ʏ': 'Y', 'ᴢ': 'Z',
-    // squared(emoji)
+    // squared (emoji)
     '🅰': 'A', '🅱': 'B', '🅲': 'C', '🅳': 'D', '🅴': 'E', '🅵': 'F', '🅶': 'G',
     '🅷': 'H', '🅸': 'I', '🅹': 'J', '🅺': 'K', '🅻': 'L', '🅼': 'M', '🅽': 'N',
     '🅾': 'O', '🅿': 'P', '🆀': 'Q', '🆁': 'R', '🆂': 'S', '🆃': 'T', '🆄': 'U',
     '🆅': 'V', '🆆': 'W', '🆇': 'X', '🆈': 'Y', '🆉': 'Z',
 };
 
-// FILTER ENGINE
+// mesin filter
 class FilterEngine {
     constructor() {
         this.threshold = 50;
@@ -67,11 +67,11 @@ class FilterEngine {
     }
 
     normalizeFancyText(text) {
-        // normalisasi bullet points dan special seperators
+        // normalisasi bullet points dan separator khusus
         let preprocessed = text
-            .replace(/[•·∙⋅°]/g, '') // hapus bullet points dan degree symbol yg dipake sebagai seperator
-            .replace(/[\u200b\u200c\u200d\ufeff]/g, '') // hapus zero-width chars
-            .replace(/[_\-\.]/g, ''); // hapus common separators
+            .replace(/[•·∙⋅°]/g, '') // hapus bullet points dan simbol derajat yg dipake buat separator
+            .replace(/[\u200b\u200c\u200d\ufeff]/g, '') // hapus karakter zero-width
+            .replace(/[_\-\.]/g, ''); // hapus separator umum
 
         const normalized = preprocessed.normalize('NFKD');
         let isFancy = false;
@@ -106,41 +106,46 @@ class FilterEngine {
         if (authorName) {
             const normalizedName = this.normalizeFancyText(authorName).normalized.toLowerCase();
 
-            // pattern: "Cari di Google" variations
+            // pola: "cari di google" variations
             if (/(cari|cek|ketik|search|temukan)\s*(di|ke|pada)?\s*g[o0]+g[l1]e/i.test(normalizedName)) {
                 score += 100;
-                reasons.push(`Suspicious Channel Name: ${authorName}`);
+                reasons.push(`nama channel mencurigakan: ${authorName}`);
             }
 
-            // pattern: "google" + gambling keyword
+            // pola: "google" + kata kunci judi
             if (/g[o0]+g[l1]e/i.test(normalizedName) &&
                 /(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|link|situs|poker|domino|qq|casino|hoki|garuda|gembira|cuanwin)/i.test(normalizedName)) {
                 score += 100;
-                reasons.push(`Suspicious Channel Name (Google+Keyword): ${authorName}`);
+                reasons.push(`nama channel mencurigakan (google+keyword): ${authorName}`);
             }
 
-            // pattern: gambling brand names/keywords in channel name
-            if (/(gembira|cuanwin|mpo|hoki|jp|jackpot|slot|gacor|maxwin|scatter|77|88|4d|bet|win|sultan|dewa|raja|king|mega|super|ultra)/i.test(normalizedName)) {
-                if (/\d+/.test(normalizedName) || /(gudang|uang|bos|cuan|dana|ovo|gopay|link|situs|resmi|terpercaya)/i.test(normalizedName)) {
-                    score += 100;
-                    reasons.push(`Suspicious Channel Name (Brand+Sth): ${authorName}`);
-                }
+            // pola: nama brand judi SPESIFIK di nama channel
+            if (/(gembira|cuanwin|mpo|maxwin|scatter|gacor|judol|togel|pragmatic|olympus|zeus)\d*/i.test(normalizedName)) {
+                score += 100;
+                reasons.push(`nama channel mencurigakan (brand judi): ${authorName}`);
             }
 
-            // pattern: "Uang" / "Cuan" / "Dana" in channel name (common in spasm bots)
+            // pola: angka judi klasik di nama (77, 88, 138, 303, 4d) + kata kunci judi
+            if (/(77|88|99|138|303|4d)/i.test(normalizedName) &&
+                /(slot|gacor|hoki|jp|jackpot|bet|cuan|depo|wd)/i.test(normalizedName)) {
+                score += 100;
+                reasons.push(`nama channel mencurigakan (angka+keyword): ${authorName}`);
+            }
+
+            // pola: "uang" / "cuan" / "dana" di nama channel (umum di bot spam)
             if (/(bagi|gudang|sumber|pusat|bandar|agen)\s*[_\-.]?\s*(uang|cuan|dana|saldo|chip)/i.test(normalizedName)) {
                 score += 100;
-                reasons.push(`Suspicious Channel Name (Money Distribution): ${authorName}`);
+                reasons.push(`nama channel mencurigakan (distribusi uang): ${authorName}`);
             }
         }
 
-        // featere 1: fancy text
+        // fitur 1: teks fancy
         if (isFancy) {
             score += 15;
-            reasons.push('Fancy Text Detected');
+            reasons.push('teks fancy terdeteksi');
         }
 
-        // feature 2: hype emoji
+        // fitur 2: emoji hype
         const hypeEmojis = ['🔥', '⚡', '🚀', '💸', '🎰', '💰', '🤑', '💎', '👑', '👹', '👺'];
         let emojiCount = 0;
         for (const emoji of hypeEmojis) {
@@ -149,50 +154,50 @@ class FilterEngine {
         if (emojiCount > 0) {
             const points = Math.min(emojiCount * 10, 40);
             score += points;
-            reasons.push(`Hype Emojis (+${points})`);
+            reasons.push(`emoji hype (+${points})`);
         }
 
-        // feature 3: emoji sandwich
+        // fitur 3: emoji sandwich
         const trimmed = text.trim();
         if (trimmed.length > 2 && /[^\x00-\x7F]/.test(trimmed[0]) && /[^\x00-\x7F]/.test(trimmed[trimmed.length - 1])) {
             score += 30;
-            reasons.push('Emoji Sandwich');
+            reasons.push('emoji sandwich');
         }
 
-        // feature 4: token anayliss
+        // fitur 4: analisis token
         const tokens = normalized.split(/\s+/);
         let allCapsScore = 0;
 
         for (const token of tokens) {
-            // all caps + digit
+            // huruf kapital semua + angka
             if (/^[A-Z]{3,}\d{1,4}$/.test(token)) {
                 score += 50;
-                reasons.push(`Brand Pattern (Caps+Digits): ${token}`);
+                reasons.push(`pola brand (kapital+angka): ${token}`);
             }
 
-            // all caps + keyword
+            // huruf kapital semua + keyword
             if (/^[A-Z]{3,}(JP|SLOT|BET|WIN|DEWA|MAX|GACOR)$/.test(token)) {
                 score += 50;
-                reasons.push(`Brand Pattern (Caps+Keyword): ${token}`);
+                reasons.push(`pola brand (kapital+keyword): ${token}`);
             }
 
             // leetspeak keyword
             if (/\b(g[4a@]c[0o]r|s[1l][0o]t|j[u0]d[0o][1l]|t[0o]g[3e]l|m[4a]xw[1i]n)\b/i.test(token)) {
                 score += 50;
-                reasons.push(`Leetspeak Keyword: ${token}`);
+                reasons.push(`keyword leetspeak: ${token}`);
             }
 
-            // all caps generics
+            // token huruf kapital generik
             if (/^[A-Z]{4,}$/.test(token) && !/\d/.test(token)) {
                 if (allCapsScore < 20) {
                     score += 5;
                     allCapsScore += 5;
-                    reasons.push(`All Caps Token: ${token}`);
+                    reasons.push(`token huruf kapital: ${token}`);
                 }
             }
         }
 
-        // disconnected brand pattern
+        // pola brand terpisah
         for (let i = 0; i < tokens.length - 1; i++) {
             const current = tokens[i];
             const next = tokens[i + 1];
@@ -202,66 +207,68 @@ class FilterEngine {
             if (/^[A-Z]{3,}$/.test(cleanCurrent)) {
                 if (/^(88|138|303|4d|69|\d{2,4})$/i.test(cleanNext)) {
                     score += 50;
-                    reasons.push(`Disconnected Brand Pattern: ${cleanCurrent} ${cleanNext}`);
+                    reasons.push(`pola brand terpisah: ${cleanCurrent} ${cleanNext}`);
                 }
             }
         }
 
-        // feature 5: strong keywords
+        // fitur 5: kata kunci kuat
         const lower = normalized.toLowerCase();
         const cleanText = lower.replace(/[^a-z0-9]/g, '');
 
-        // expanded strong keywords including new gambling brands
-        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|link|situs|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|withdraw|deposit|bonus|promo|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|bet|menang|kemenangan|untung|profit|rtp|winrate|gelora)\b/.test(lower)) {
+        // kata kunci kuat - hanya yang spesifik judi, hapus yang terlalu umum
+        // dihapus: menang, kemenangan, untung, profit, bonus, promo, link, situs, deposit, withdraw (terlalu umum)
+        if (/\b(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|depo|wd|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|modal|receh|jp|jackpot|terpercaya|resmi|gembira|cuanwin|mpo|sensational|starlight|bonanza|mahjong|gates|wild|mania|spin|rtp|winrate|gelora)\b/.test(lower)) {
             score += 50;
-            reasons.push('Strong Keyword Match');
+            reasons.push('kata kunci kuat cocok');
         } else if (/(slot|gacor|judol|togel|maxwin|zeus|olympus|pragmatic|scatter|poker|domino|qq|casino|hoki|garuda|cuan|saldo|sultan|jackpot|gembira|cuanwin|mpo)/.test(cleanText)) {
             score += 50;
-            reasons.push('Strong Keyword Match (Spaced/Hidden)');
+            reasons.push('kata kunci kuat cocok (tersembunyi/spasi)');
         }
 
-        // brand + 4D/numbers pattern
+        // pola brand + 4D/angka
         if (/[A-Z]{3,}\d{1,4}/.test(normalized) || /\d{1,4}[A-Z]{3,}/.test(normalized)) {
             score += 60;
-            reasons.push('Brand+Number Pattern (e.g. XXXX4D)');
+            reasons.push('pola brand+angka (misal XXXX4D)');
         }
 
-        // brand ending with 4D (togel term - "4 Dimensi")
+        // brand berakhir 4D (istilah togel - "4 dimensi")
         if (/[A-Z]{3,}4D\b/i.test(normalized) || /[a-z]{3,}4d\b/.test(cleanText)) {
             score += 80;
-            reasons.push('Togel 4D Brand Pattern');
+            reasons.push('pola brand togel 4D');
         }
 
-        // gambling suffix (added 77, 99, 123, 168, 777)
+        // suffix judi (tambah 77, 99, 123, 168, 777)
         if (/\b\w*(77|88|99|123|138|168|303|777|4d|69)\b/.test(lower)) {
             score += 20;
-            reasons.push('Gambling Suffix Match');
+            reasons.push('suffix judi cocok');
         }
 
-        // leetspeak on nospaces
+        // leetspeak tanpa spasi
         if (/(g[4a@]c[0o]r|s[1l][0o]t|j[u0]d[0o][1l]|t[0o]g[3e]l|m[4a]xw[1i]n)/.test(cleanText)) {
             score += 50;
-            reasons.push('Leetspeak Keyword (Spaced/NoSpaces)');
+            reasons.push('keyword leetspeak (tanpa spasi)');
         }
 
-        // obfuscated gacor patterns (geacorrz, gacorrr, g4corr, ghacor, etc)
+        // pola gacor yang disamarkan (geacorrz, gacorrr, g4corr, ghacor, dll)
         if (/(g[e3]?[a4@]c[o0]r+z?|g[a4@]c[o0]r{2,}|gac[0o]rr?|gh[a4]c[o0]r)/.test(cleanText)) {
             score += 60;
-            reasons.push('Obfuscated Gacor Pattern');
+            reasons.push('pola gacor disamarkan');
         }
 
-        // brand + number pattern (GEMBIRA77, HOKI88, etc)
-        if (/\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|bet|win|max|sultan|dewa|raja|king|mega|super|ultra)[\s•·]*\d{2,4}\b/i.test(text) ||
-            /\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|bet|win|max|sultan|dewa|raja|king|mega|super|ultra)\d{2,4}\b/i.test(cleanText)) {
+        // pola brand + angka (GEMBIRA77, HOKI88, dll)
+        // hapus kata umum yang bisa bikin false positive
+        if (/\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|gacor|maxwin|scatter|togel|pragmatic)[\s•·]*\d{2,4}\b/i.test(text) ||
+            /\b(gembira|hoki|mpo|cuan|jp|jackpot|slot|gacor|maxwin|scatter|togel|pragmatic)\d{2,4}\b/i.test(cleanText)) {
             score += 70;
-            reasons.push('Gambling Brand+Number Pattern');
+            reasons.push('pola brand judi+angka');
         }
 
-        // invitation patterns ("cuan mudah", "dapat cuwaan", etc)
+        // pola ajakan ("cuan mudah", "dapat cuwaan", dll)
         if (/(dapat|dpt|bisa|mudah|gampang|langsung|auto)\s*(cuan|untung|menang|jackpot|jp|wd|withdraw)/i.test(lower) ||
             /(cuan|untung|menang|jackpot|jp)\s*(mudah|gampang|langsung|auto)/i.test(lower)) {
             score += 40;
-            reasons.push('Gambling Invitation Pattern');
+            reasons.push('pola ajakan judi');
         }
 
         return { score, reasons };
@@ -273,46 +280,59 @@ class FilterEngine {
     }
 }
 
-// MAIN CONTENT SCRIPT
+// skrip konten utama
 const filterEngine = new FilterEngine();
 let processedComments = new WeakSet();
 let statsUpdateCallback = null;
 
-// load settings from storage
-chrome.storage.sync.get(['enabled', 'threshold'], (result) => {
+// daftar komentar judol buat fitur navigasi
+let judolComments = [];
+let judolIdCounter = 0;
+
+// mode: 'hide' = sembunyikan semua judol, 'check' = tampilkan judol buat navigasi
+let currentMode = 'hide';
+
+// muat pengaturan dari storage
+chrome.storage.sync.get(['enabled', 'threshold', 'mode'], (result) => {
     filterEngine.enabled = result.enabled !== false; // default true
     if (result.threshold) filterEngine.threshold = result.threshold;
+    currentMode = result.mode || 'hide';
 });
 
-// listen for setting changes
+// dengarkan perubahan pengaturan
 chrome.storage.onChanged.addListener((changes) => {
     if (changes.enabled) filterEngine.enabled = changes.enabled.newValue;
     if (changes.threshold) filterEngine.threshold = changes.threshold.newValue;
+    if (changes.mode) currentMode = changes.mode.newValue;
 
-    // re-process all comments when settings change
-    if (changes.enabled || changes.threshold) {
+    // proses ulang semua komentar kalau pengaturan berubah
+    if (changes.enabled || changes.threshold || changes.mode) {
         resetAndReprocess();
     }
 });
 
 function resetAndReprocess() {
-    // show all previously hidden comments first
-    document.querySelectorAll('.heimdall-hidden').forEach(el => {
-        el.classList.remove('heimdall-hidden');
+    // hapus semua class heimdall dari semua komentar
+    document.querySelectorAll('.heimdall-hidden, .heimdall-check, .heimdall-highlight, .heimdall-shown').forEach(el => {
+        el.classList.remove('heimdall-hidden', 'heimdall-check', 'heimdall-highlight', 'heimdall-shown');
     });
 
-    // reset counter and processed set
+    // reset counter dan processed set
     filterEngine.hiddenCount = 0;
     processedComments = new WeakSet();
 
-    // re-process
+    // reset daftar judol buat navigasi
+    judolComments = [];
+    judolIdCounter = 0;
+
+    // proses ulang
     processComments();
 }
 
 function processComments() {
     if (!filterEngine.enabled) return;
 
-    // youTube comment selectors (multiple for different layouts)
+    // selector komentar youtube (beberapa buat layout berbeda)
     const commentSelectors = [
         'ytd-comment-renderer',
         'ytd-comment-view-model',
@@ -326,18 +346,40 @@ function processComments() {
             if (processedComments.has(commentEl)) return;
             processedComments.add(commentEl);
 
-            // get comment text
+            // ambil teks komentar
             const textEl = commentEl.querySelector('#content-text, .yt-core-attributed-string');
             const authorEl = commentEl.querySelector('#author-text, .ytd-channel-name');
 
             if (!textEl) return;
 
             const text = textEl.innerText || textEl.textContent || '';
-            const authorName = authorEl ? (authorEl.innerText || authorEl.textContent || '') : '';
+            const authorName = authorEl ? (authorEl.innerText || authorEl.textContent || '').trim() : 'Unknown';
 
-            if (filterEngine.shouldHide(text, authorName)) {
-                commentEl.classList.add('heimdall-hidden');
+            const { score } = filterEngine.calculateScore(text, authorName);
+
+            if (score >= filterEngine.threshold) {
+                // terapkan class sesuai mode saat ini
+                if (currentMode === 'hide') {
+                    commentEl.classList.add('heimdall-hidden');
+                } else {
+                    // mode 'check' - komentar terlihat tapi ditandai buat navigasi
+                    commentEl.classList.add('heimdall-check');
+                }
+
                 filterEngine.hiddenCount++;
+
+                // simpan komentar judol buat navigasi
+                const judolId = judolIdCounter++;
+                commentEl.dataset.heimdallId = judolId;
+
+                judolComments.push({
+                    id: judolId,
+                    element: commentEl,
+                    author: authorName.substring(0, 30),
+                    preview: text.substring(0, 60) + (text.length > 60 ? '...' : ''),
+                    score: score
+                });
+
                 updateStats();
             }
         });
@@ -345,16 +387,16 @@ function processComments() {
 }
 
 function updateStats() {
-    // send stats to popup if it's open
+    // kirim stats ke popup kalau lagi dibuka
     chrome.runtime.sendMessage({
         type: 'statsUpdate',
         hiddenCount: filterEngine.hiddenCount
     }).catch(() => {
-        // popup not open, ignore error
+        // popup gak dibuka, abaikan error
     });
 }
 
-// MUTATION OBSERVER
+// mutation observer
 const observer = new MutationObserver((mutations) => {
     let shouldProcess = false;
 
@@ -372,9 +414,9 @@ const observer = new MutationObserver((mutations) => {
     }
 });
 
-// start observing
+// mulai observing
 function startObserver() {
-    // observe the main content area
+    // observe area konten utama
     const targetNode = document.querySelector('ytd-app') || document.body;
 
     observer.observe(targetNode, {
@@ -382,30 +424,83 @@ function startObserver() {
         subtree: true
     });
 
-    // initial process
+    // proses awal
     processComments();
 }
 
-// wait for page to be ready
+// tunggu halaman siap
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', startObserver);
 } else {
     startObserver();
 }
 
-// process on scroll (for infinite loading)
+// proses waktu scroll (buat infinite loading)
 let scrollTimeout;
 window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(processComments, 200);
 }, { passive: true });
 
-// listen for messages from popup
+// dengarkan pesan dari popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'getStats') {
         sendResponse({ hiddenCount: filterEngine.hiddenCount });
     }
+
+    // ambil daftar komentar judol buat navigasi
+    if (request.type === 'getJudolList') {
+        const list = judolComments.map(item => ({
+            id: item.id,
+            author: item.author,
+            preview: item.preview,
+            score: item.score
+        }));
+        sendResponse({ judolList: list });
+    }
+
+    // scroll ke komentar judol tertentu
+    if (request.type === 'scrollToComment') {
+        const comment = judolComments.find(c => c.id === request.id);
+        if (comment && comment.element) {
+            // tampilkan komentar sementara
+            comment.element.classList.remove('heimdall-hidden');
+            comment.element.classList.add('heimdall-shown');
+
+            // scroll ke sana
+            comment.element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            // tambah efek highlight
+            comment.element.classList.add('heimdall-highlight');
+
+            // hapus highlight setelah 3 detik
+            setTimeout(() => {
+                comment.element.classList.remove('heimdall-highlight');
+            }, 3000);
+
+            sendResponse({ success: true });
+        } else {
+            sendResponse({ success: false, error: 'komentar gak ditemukan' });
+        }
+    }
+
+    // sembunyikan komentar lagi setelah navigasi
+    if (request.type === 'hideComment') {
+        const comment = judolComments.find(c => c.id === request.id);
+        if (comment && comment.element) {
+            comment.element.classList.remove('heimdall-shown');
+            comment.element.classList.remove('heimdall-highlight');
+            comment.element.classList.add('heimdall-hidden');
+            sendResponse({ success: true });
+        } else {
+            sendResponse({ success: false });
+        }
+    }
+
     return true;
 });
 
-console.log('HeimdallScan: YouTube Judol Filter aktif!');
+console.log('HeimdallScan: filter judol youtube aktif!');

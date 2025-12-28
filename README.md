@@ -1,5 +1,5 @@
 # Unduh Cepat
-https://cdn.jasasolin.com/projects/heimdall/heimdall-extension.zip
+https://chromewebstore.google.com/detail/jlpmmdplipeoafaijjmbfjegnkajigem
 
 # HeimdallScan - YouTube Judol Filter Extension
 

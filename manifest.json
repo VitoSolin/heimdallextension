@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "HeimdallScan - YouTube Judol Filter",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Filter otomatis untuk menyembunyikan komentar judi online (judol) di YouTube. Lindungi dari spam gambling!",
     "permissions": [
         "storage"
